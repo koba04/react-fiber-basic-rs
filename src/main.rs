@@ -16,10 +16,11 @@ fn create_fiber<'a>(type_: &'a str, children: Vec<OptionnalFiber<'a>>) -> Fiber<
 }
 
 fn create_markup(fiber: &Fiber) -> String {
-    let mut markup = String::from(format!("<{}>\n", fiber.type_));
+    let mut markup = String::from(format!("<{}>", fiber.type_));
     if let Some(child) = fiber.child {
-        markup.push_str(create_markup(child).as_str())
+        markup.push_str(create_markup(child).as_str());
     }
+    markup.push_str(format!("</{}>", fiber.type_).as_str());
     markup
 }
 
@@ -44,6 +45,9 @@ mod tests {
         let span = create_fiber("span", vec![None]);
         let p = create_fiber("p", vec![Some(&span)]);
         let section = create_fiber("section", vec![Some(&p)]);
-        assert_eq!(render(&section), "<section>\n<p>\n<span>\n")
+        assert_eq!(
+            render(&section),
+            "<section><p><span></span></p></section>"
+        )
     }
 }
